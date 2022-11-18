@@ -1,5 +1,12 @@
 {
     "sites": [
+        "central.github.com",
+        "github.map.fastly.net",
+        "github.io",
+        "docs.github.com",
+        "d3c33hcgiwev3.cloudfront.net",
+        "store.steampowered.com",
+        "steamcommunity.com",
         "github.global.ssl.fastly.net",
         "assets-cdn.github.com",
         "documentcloud.github.com",

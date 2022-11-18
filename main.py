@@ -6,7 +6,8 @@
 @License :   Copyright © 2017-2022 liuyuqi. All Rights Reserved.
 @Desc    :   main function
 '''
-import github_host
+from github_host.github import Github
 
 if __name__ == '__main__':
-    github_host.main()
+    github = Github()
+    github.updateHost()

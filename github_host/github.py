@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@Contact :   liuyuqi.gov@msn.cn
-@Time    :   2019/08/03 16:16:59
+@Contact :   icsying@outlook.com
+@Time    :   2022-11-18 20:45:12
 @License :   Copyright © 2017-2022 liuyuqi. All Rights Reserved.
 @Desc    :   refeash github host everyday
 '''
 import os
 import datetime
-from github_host import get_ip_utils
+from github_host.get_ip_utils import REGISTRY_IP
 from github_host.libs.json_conf import JsonConf
+import logging
 
 
 class Github(object):
@@ -20,6 +21,7 @@ class Github(object):
         self.sites = self.conf.get('sites')
         self.addr2ip = {}
         self.hostLocation = r"hosts"
+        self.seq = ['ipapi', 'chinaz', 'ipaddress']
 
     def dropDuplication(self, line):
         flag = False
@@ -35,21 +37,26 @@ class Github(object):
     # 更新host, 并刷新本地DNS
     def updateHost(self):
         today = datetime.date.today()
+        for site in self.sites[:]:
+            for k in self.seq:
+                trueip = REGISTRY_IP[k](site)
+                if trueip is not None:
+                    self.addr2ip[site] = trueip
+                    print(site + "\t" + trueip)
+                    break
+        
         for site in self.sites:
-            trueip = get_ip_utils.getIpFromipapi(site)
-            if trueip != None:
-                self.addr2ip[site] = trueip
-                print(site + "\t" + trueip)
+            if site not in self.addr2ip:
+                logging.warn(f"Missing: {site}")
+
         with open(self.hostLocation, "r") as f1:
             f1_lines = f1.readlines()
             with open("temphost", "w") as f2:
-                for line in f1_lines:                       # 为了防止 host 越写用越长，需要删除之前更新的含有github相关内容
+                for line in f1_lines:
                     if self.dropDuplication(line) == False:
                         f2.write(line)
-                f2.write("#*********************github " +
-                         str(today) + " update********************\n")
-                f2.write(
-                    "#******* get latest hosts: http://blog.yoqi.me/lyq/16489.html\n")
+                f2.write("#*********************github " + str(today) +
+                         " update********************\n")
                 for key in self.addr2ip:
                     f2.write(self.addr2ip[key] + "\t" + key + "\n")
         os.remove(self.hostLocation)
