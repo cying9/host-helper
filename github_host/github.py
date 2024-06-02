@@ -6,21 +6,19 @@
 @License :   Copyright © 2017-2022 liuyuqi. All Rights Reserved.
 @Desc    :   refeash github host everyday
 '''
-import os
 import datetime
-from github_host.get_ip_utils import REGISTRY_IP
-from github_host.libs.json_conf import JsonConf
 import logging
+import os
+
+from github_host.get_ip_utils import REGISTRY_IP
 
 
 class Github(object):
 
     def __init__(self):
-        self.jsonConf = JsonConf()
-        self.conf = self.jsonConf.load()
-        self.sites = self.conf.get('sites')
+        self.sites = [x.replace('\n', '') for x in open("sites.txt", "r").readlines()]
         self.addr2ip = {}
-        self.hostLocation = r"hosts"
+        self.hostLocation = "hosts"
         self.seq = ['ipapi', 'chinaz', 'ipaddress']
 
     def dropDuplication(self, line):
@@ -40,7 +38,7 @@ class Github(object):
         for site in self.sites[:]:
             for k in self.seq:
                 trueip = REGISTRY_IP[k](site)
-                if trueip is not None:
+                if trueip:
                     self.addr2ip[site] = trueip
                     print(site + "\t" + trueip)
                     break
